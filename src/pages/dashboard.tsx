@@ -62,7 +62,9 @@ export default function Dashboard() {
           <p className="text-gray-400 text-sm mt-1">Unit {resident.unit} &middot; Building {resident.building} &middot; {resident.totalWins} win{resident.totalWins !== 1 ? 's' : ''} all time</p>
         </div>
         {raffleMsg && <Alert variant={raffleMsg.type} message={raffleMsg.text} onClose={() => setRaffleMsg(null)} />}
-        <section><h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">Current Spot</h2><SpotCard spot={currentSpot} /></section>
+        {resident.role !== 'admin' && (
+          <section><h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">Current Spot</h2><SpotCard spot={currentSpot} /></section>
+        )}
         <section>
           <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">Raffle Status</h2>
           <EligibilityBanner isRegisteredInRaffle={eligibility.isRegisteredInRaffle} hasActiveRaffle={!!raffle} onRegister={joinRaffle} registering={registering} />

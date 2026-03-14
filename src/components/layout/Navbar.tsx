@@ -3,8 +3,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useAuth0 } from '@auth0/auth0-react';
 
-const navLinks   = [{ href: '/dashboard', label: 'Dashboard' }, { href: '/history', label: 'My History' }, { href: '/raffle', label: 'Raffle' }];
-const adminLinks = [{ href: '/admin', label: 'Overview' }, { href: '/admin/spots', label: 'Spots' }, { href: '/admin/residents', label: 'Residents' }, { href: '/admin/raffle', label: 'Raffle Mgmt' }];
+const navLinks   = [{ href: '/dashboard', label: 'Dashboard' }, { href: '/history', label: 'My History' }, { href: '/raffle', label: 'Raffle', disabled: true }];
+const adminLinks = [{ href: '/admin', label: 'Overview' }, { href: '/admin/spots', label: 'Spots' }, { href: '/admin/residents', label: 'Residents', disabled: true }, { href: '/admin/raffle', label: 'Raffle Mgmt', disabled: true }];
 
 export const Navbar: React.FC<{ role: 'resident' | 'admin' }> = ({ role }) => {
   const { logout, user } = useAuth0();
@@ -19,7 +19,11 @@ export const Navbar: React.FC<{ role: 'resident' | 'admin' }> = ({ role }) => {
         </Link>
         <div className="hidden sm:flex items-center gap-1">
           {links.map(l => (
-            <Link key={l.href} href={l.href} className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${pathname.startsWith(l.href) ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}>{l.label}</Link>
+            l.disabled ? (
+              <span key={l.href} className="px-3 py-2 rounded-lg text-sm font-medium text-gray-300 cursor-not-allowed">{l.label}</span>
+            ) : (
+              <Link key={l.href} href={l.href} className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${pathname.startsWith(l.href) ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}>{l.label}</Link>
+            )
           ))}
         </div>
         <div className="flex items-center gap-3">

@@ -14,6 +14,9 @@ export function useAdminStats(building: string) {
   const [stats,   setStats]   = useState<AdminStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error,   setError]   = useState<string | null>(null);
+  const [tick,    setTick]    = useState(0);
+
+  const refetch = () => setTick(t => t + 1);
 
   useEffect(() => {
     if (!building) return;
@@ -22,7 +25,7 @@ export function useAdminStats(building: string) {
       .then(r => setStats(r.data ?? null))
       .catch(e => setError(e.message))
       .finally(() => setLoading(false));
-  }, [building]); // eslint-disable-line
+  }, [building, tick]); // eslint-disable-line
 
-  return { stats, loading, error };
+  return { stats, loading, error, refetch };
 }

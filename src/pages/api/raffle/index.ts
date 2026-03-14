@@ -33,7 +33,7 @@ const createRaffle = withAdmin(async (req, res: NextApiResponse<ApiResponse>) =>
   const last = await RaffleRoundModel.findOne({ building }).sort({ roundNumber: -1 }).select('roundNumber').lean();
   const roundNumber = (last?.roundNumber ?? 0) + 1;
 
-  const raffle = await RaffleRoundModel.create({ roundNumber, building, startDate: new Date(startDate), endDate: new Date(endDate), status: 'pending' });
+  const raffle = await RaffleRoundModel.create({ roundNumber, building, startDate: new Date(startDate), endDate: new Date(endDate), status: 'active' });
   await cacheDel(CacheKey.currentRaffle(building));
   return res.status(201).json({ success: true, data: raffle.toObject(), message: `Round ${roundNumber} created` });
 });

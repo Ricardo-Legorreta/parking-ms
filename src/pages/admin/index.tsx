@@ -14,7 +14,7 @@ export default function AdminPage() {
   const router = useRouter();
   const { data: me, loading: meLoading } = useMe();
   const [building, setBuilding] = useState('A');
-  const { stats, loading, error } = useAdminStats(building);
+  const { stats, loading, error, refetch } = useAdminStats(building);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) router.push('/');
@@ -41,7 +41,7 @@ export default function AdminPage() {
         {stats   && <StatsGrid stats={stats} />}
         {stats   && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <RaffleManager building={building} activeRaffle={stats.activeRaffle as any} onRefresh={() => window.location.reload()} />
+            <RaffleManager building={building} activeRaffle={stats.activeRaffle as any} onRefresh={refetch} />
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
               <h2 className="text-lg font-bold text-gray-800">Top Winners</h2>
               {stats.topWinners.length === 0 ? (
