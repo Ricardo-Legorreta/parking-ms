@@ -1,0 +1,19 @@
+name: Cron — Expire Spots
+on:
+  schedule:
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+jobs:
+  expire:
+    name: Sweep expired assignments
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call expire-spots API
+        run: |
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X POST \
+            -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json" \
+            "${{ secrets.APP_BASE_URL }}/api/admin/expire-spots")
+          echo "HTTP status: $RESPONSE"
+          if [ "$RESPONSE" != "200" ]; then exit 1; fi

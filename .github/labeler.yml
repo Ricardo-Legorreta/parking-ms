@@ -1,0 +1,10 @@
+frontend:
+  - src/pages/**
+  - src/components/**
+  - src/hooks/**
+backend:
+  - src/pages/api/**
+  - src/lib/**
+  - src/models/**
+ci:
+  - .github/**

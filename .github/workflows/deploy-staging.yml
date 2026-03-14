@@ -1,0 +1,34 @@
+name: Deploy → Staging
+on:
+  push:
+    branches: [develop]
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: true
+jobs:
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "20.x", cache: npm }
+      - run: npm ci
+      - name: Build for staging
+        run: npm run build
+        env:
+          NEXT_PUBLIC_AUTH0_DOMAIN:    ${{ secrets.STAGING_AUTH0_DOMAIN }}
+          NEXT_PUBLIC_AUTH0_CLIENT_ID: ${{ secrets.STAGING_AUTH0_CLIENT_ID }}
+          NEXT_PUBLIC_AUTH0_AUDIENCE:  ${{ secrets.STAGING_AUTH0_AUDIENCE }}
+      - uses: amondnet/vercel-action@v25
+        with:
+          vercel-token:      ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id:     ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          alias-domains:     parking-staging.yourdomain.com
+      - if: success()
+        uses: slackapi/slack-github-action@v1.26.0
+        with:
+          payload: '{"text": "ParkingMS staging deployed — `${{ github.actor }}`"}'
+        env: { SLACK_WEBHOOK_URL: "${{ secrets.SLACK_WEBHOOK_URL }}" }
