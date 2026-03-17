@@ -7,7 +7,7 @@ import { Navbar } from '@/components/layout/Navbar';
 import { SpotCard } from '@/components/resident/SpotCard';
 import { EligibilityBanner } from '@/components/resident/EligibilityBanner';
 import { Alert } from '@/components/ui/Alert';
-import { Badge } from '@/components/ui/Badge';
+
 
 export default function Dashboard() {
   const { isAuthenticated, isLoading: authLoading } = useAuth0();
@@ -17,7 +17,7 @@ export default function Dashboard() {
   const [registering, setRegistering] = useState(false);
   const [raffleMsg,   setRaffleMsg]   = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-  useEffect(() => { if (!authLoading && !isAuthenticated) router.push('/'); }, [authLoading, isAuthenticated]); // eslint-disable-line
+  useEffect(() => { if (!authLoading && !isAuthenticated) router.push('/'); }, [authLoading, isAuthenticated]);  
 
   const joinRaffle = async () => {
     setRegistering(true); setRaffleMsg(null);

@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 export default function LandingPage() {
   const { loginWithRedirect, isAuthenticated, isLoading } = useAuth0();
   const router = useRouter();
-  useEffect(() => { if (!isLoading && isAuthenticated) router.push('/dashboard'); }, [isAuthenticated, isLoading]); // eslint-disable-line
+  useEffect(() => { if (!isLoading && isAuthenticated) router.push('/dashboard'); }, [isAuthenticated, isLoading]);  
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center px-4">

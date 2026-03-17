@@ -19,7 +19,7 @@ export function sanitizeObject<T extends Record<string, unknown>>(obj: T): T {
 }
 
 export function isValidPlate(plate: string): boolean {
-  return /^[A-Z0-9\-]{4,10}$/i.test(plate.trim());
+  return /^[A-Z0-9-]{4,10}$/i.test(plate.trim());
 }
 
 export function isValidObjectId(id: unknown): boolean {
