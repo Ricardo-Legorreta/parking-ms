@@ -38,7 +38,7 @@ export default function AdminSpotsPage() {
   useEffect(() => {
     if (!authLoading && !isAuthenticated) router.push('/');
     if (!meLoading && me && me.resident.role !== 'admin') router.push('/dashboard');
-  }, [authLoading, isAuthenticated, meLoading, me]); // eslint-disable-line
+  }, [authLoading, isAuthenticated, meLoading, me]);  
 
   const fetchSpots = useCallback(() => {
     setLoading(true);
@@ -47,7 +47,7 @@ export default function AdminSpotsPage() {
       .then(r => setSpots(r.data ?? []))
       .catch(e => setError(e.message))
       .finally(() => setLoading(false));
-  }, [building]); // eslint-disable-line
+  }, [building]);  
 
   useEffect(() => { fetchSpots(); }, [fetchSpots]);
 

@@ -25,6 +25,6 @@ export function useMe() {
     } finally { setLoading(false); }
   }, [api]);
 
-  useEffect(() => { fetchData(); }, []); // eslint-disable-line
+  useEffect(() => { fetchData(); }, []);  
   return { data, loading, error, refetch: fetchData };
 }

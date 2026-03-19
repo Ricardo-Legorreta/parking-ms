@@ -33,13 +33,3 @@ jobs:
           tag_name:     "v${{ github.run_number }}"
           release_name: "Release v${{ github.run_number }}"
           body:         "Auto-released from ${{ github.sha }}"
-      - if: success()
-        uses: slackapi/slack-github-action@v1.26.0
-        with:
-          payload: '{"text": "ParkingMS PRODUCTION deployed — v${{ github.run_number }}"}'
-        env: { SLACK_WEBHOOK_URL: "${{ secrets.SLACK_WEBHOOK_URL }}" }
-      - if: failure()
-        uses: slackapi/slack-github-action@v1.26.0
-        with:
-          payload: '{"text": "ParkingMS PRODUCTION FAILED — <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View run>"}'
-        env: { SLACK_WEBHOOK_URL: "${{ secrets.SLACK_WEBHOOK_URL }}" }

@@ -3,11 +3,10 @@ import mongoose from 'mongoose';
 const MONGODB_URI = process.env.MONGODB_URI!;
 if (!MONGODB_URI) throw new Error('Missing MONGODB_URI');
 
-let cached = (global as any).__mongooseCache as {
-  conn   : typeof mongoose | null;
-  promise: Promise<typeof mongoose> | null;
+const globalWithCache = global as typeof globalThis & {
+  __mongooseCache?: { conn: typeof mongoose | null; promise: Promise<typeof mongoose> | null };
 };
-if (!cached) cached = (global as any).__mongooseCache = { conn: null, promise: null };
+const cached = globalWithCache.__mongooseCache ?? (globalWithCache.__mongooseCache = { conn: null, promise: null });
 
 export async function connectDB(): Promise<typeof mongoose> {
   if (cached.conn) return cached.conn;

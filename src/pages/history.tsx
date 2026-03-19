@@ -15,8 +15,8 @@ export default function HistoryPage() {
   const [history, setHistory] = useState<IParkingHistory[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => { if (!authLoading && !isAuthenticated) router.push('/'); }, [authLoading, isAuthenticated]); // eslint-disable-line
-  useEffect(() => { api.get<IParkingHistory[]>('/history').then(r => setHistory(r.data ?? [])).finally(() => setLoading(false)); }, []); // eslint-disable-line
+  useEffect(() => { if (!authLoading && !isAuthenticated) router.push('/'); }, [authLoading, isAuthenticated]);  
+  useEffect(() => { api.get<IParkingHistory[]>('/history').then(r => setHistory(r.data ?? [])).finally(() => setLoading(false)); }, []);  
 
   return (
     <div className="min-h-screen bg-gray-50">

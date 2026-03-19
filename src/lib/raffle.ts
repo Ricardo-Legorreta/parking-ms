@@ -1,4 +1,4 @@
-import type { IResident, IParkingSpot, RaffleEngineInput, RaffleEngineOutput, RaffleAssignment } from '@/types';
+import type { IResident, RaffleEngineInput, RaffleEngineOutput, RaffleAssignment } from '@/types';
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];

@@ -12,7 +12,7 @@ function validateForm(f: FormData): string | null {
   if (!f.unit.trim())         return 'Unit number is required';
   if (!f.building.trim())     return 'Building is required';
   if (!f.vehiclePlate.trim()) return 'License plate is required';
-  if (!/^[A-Z0-9\-]{4,10}$/i.test(f.vehiclePlate)) return 'Plate must be 4-10 alphanumeric characters';
+  if (!/^[A-Z0-9-]{4,10}$/i.test(f.vehiclePlate)) return 'Plate must be 4-10 alphanumeric characters';
   if (!f.vehicleModel.trim()) return 'Vehicle model is required';
   if (!f.vehicleColor.trim()) return 'Vehicle color is required';
   return null;

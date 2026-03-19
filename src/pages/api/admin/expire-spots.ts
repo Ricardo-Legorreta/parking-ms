@@ -22,6 +22,10 @@ export default async function expireHandler(req: NextApiRequest, res: NextApiRes
   ]);
 
   const buildings = [...new Set(expiredSpots.map(s => s.building as string))];
-  await Promise.all([...buildings.map(b => cacheDel(CacheKey.spots(b))), cacheInvalidatePattern('history:*')]);
+  try {
+    await Promise.all([...buildings.map(b => cacheDel(CacheKey.spots(b))), cacheInvalidatePattern('history:*')]);
+  } catch {
+    console.warn('[expire-spots] Cache invalidation failed (Redis may be unavailable)');
+  }
   return res.status(200).json({ success: true, message: `${expiredSpots.length} spot(s) released`, data: { count: expiredSpots.length, buildings } });
 }
