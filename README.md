@@ -149,6 +149,10 @@ db.residents.updateOne(
 | `npm run test` | Run tests |
 | `npm run seed` | Seed database with sample data |
 
+## Documentation
+
+For a comprehensive walkthrough of the codebase — architecture, authentication, database schemas, API details, and onboarding instructions — see the [Developer Guide](docs/developer-guide.md).
+
 ## License
 
 MIT
