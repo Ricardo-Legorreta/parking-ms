@@ -1,14 +1,32 @@
 import { createClient } from 'redis';
 
 const REDIS_URL = process.env.REDIS_URL ?? 'redis://localhost:6379';
+const CONNECT_TIMEOUT_MS = 3_000;
 let redisClient: ReturnType<typeof createClient> | null = null;
+let connectPromise: Promise<ReturnType<typeof createClient>> | null = null;
 
 export async function getRedis() {
   if (redisClient?.isOpen) return redisClient;
-  redisClient = createClient({ url: REDIS_URL });
-  redisClient.on('error', (err) => console.error('[Redis]', err));
-  await redisClient.connect();
-  return redisClient;
+
+  if (connectPromise) return connectPromise;
+
+  connectPromise = (async () => {
+    redisClient = createClient({
+      url: REDIS_URL,
+      socket: { connectTimeout: CONNECT_TIMEOUT_MS, reconnectStrategy: false },
+    });
+    redisClient.on('error', (err) => console.error('[Redis]', err));
+    await redisClient.connect();
+    return redisClient;
+  })();
+
+  try {
+    return await connectPromise;
+  } catch (err) {
+    redisClient = null;
+    connectPromise = null;
+    throw err;
+  }
 }
 
 export const TTL = {
