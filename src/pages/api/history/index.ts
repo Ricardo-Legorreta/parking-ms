@@ -7,13 +7,19 @@ import type { ApiResponse, IParkingHistory } from '@/types';
 
 export default withAuth(async (req, res: NextApiResponse<ApiResponse>) => {
   if (req.method !== 'GET') return res.status(405).json({ success: false, error: 'Method not allowed' });
-  const residentId = req.user.residentId!;
-  const cacheKey   = CacheKey.myHistory(residentId);
-  const cached     = await cacheGet<IParkingHistory[]>(cacheKey);
-  if (cached) return res.status(200).json({ success: true, data: cached });
 
-  await connectDB();
-  const history = await ParkingHistoryModel.find({ residentId }).populate('spotId', 'spotNumber floor type building').sort({ roundNumber: -1 }).lean();
-  await cacheSet(cacheKey, history, TTL.HISTORY);
-  return res.status(200).json({ success: true, data: history as unknown as IParkingHistory[] });
+  try {
+    const residentId = req.user.residentId!;
+    const cacheKey   = CacheKey.myHistory(residentId);
+    const cached     = await cacheGet<IParkingHistory[]>(cacheKey);
+    if (cached) return res.status(200).json({ success: true, data: cached });
+
+    await connectDB();
+    const history = await ParkingHistoryModel.find({ residentId }).populate('spotId', 'spotNumber floor type building').sort({ roundNumber: -1 }).lean();
+    await cacheSet(cacheKey, history, TTL.HISTORY);
+    return res.status(200).json({ success: true, data: history as unknown as IParkingHistory[] });
+  } catch (err) {
+    console.error('[history]', err);
+    return res.status(500).json({ success: false, error: 'Failed to fetch parking history' });
+  }
 });

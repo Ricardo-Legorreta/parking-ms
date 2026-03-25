@@ -19,29 +19,46 @@ export const TTL = {
 } as const;
 
 export async function cacheGet<T>(key: string): Promise<T | null> {
-  const c   = await getRedis();
-  const raw = await c.get(key);
-  return raw ? (JSON.parse(raw) as T) : null;
+  try {
+    const c   = await getRedis();
+    const raw = await c.get(key);
+    return raw ? (JSON.parse(raw) as T) : null;
+  } catch (err) {
+    console.error('[Redis] cacheGet failed:', err);
+    return null;
+  }
 }
 
 export async function cacheSet<T>(key: string, value: T, ttl: number): Promise<void> {
-  const c = await getRedis();
-  await c.set(key, JSON.stringify(value), { EX: ttl });
+  try {
+    const c = await getRedis();
+    await c.set(key, JSON.stringify(value), { EX: ttl });
+  } catch (err) {
+    console.error('[Redis] cacheSet failed:', err);
+  }
 }
 
 export async function cacheDel(...keys: string[]): Promise<void> {
-  const c = await getRedis();
-  if (keys.length) await c.del(keys);
+  try {
+    const c = await getRedis();
+    if (keys.length) await c.del(keys);
+  } catch (err) {
+    console.error('[Redis] cacheDel failed:', err);
+  }
 }
 
 export async function cacheInvalidatePattern(pattern: string): Promise<void> {
-  const c = await getRedis();
-  let cursor = 0;
-  do {
-    const reply = await c.scan(cursor, { MATCH: pattern, COUNT: 100 });
-    cursor = reply.cursor;
-    if (reply.keys.length) await c.del(reply.keys);
-  } while (cursor !== 0);
+  try {
+    const c = await getRedis();
+    let cursor = 0;
+    do {
+      const reply = await c.scan(cursor, { MATCH: pattern, COUNT: 100 });
+      cursor = reply.cursor;
+      if (reply.keys.length) await c.del(reply.keys);
+    } while (cursor !== 0);
+  } catch (err) {
+    console.error('[Redis] cacheInvalidatePattern failed:', err);
+  }
 }
 
 export const CacheKey = {
