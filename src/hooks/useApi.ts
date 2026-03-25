@@ -17,7 +17,10 @@ export function useApi() {
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: body ? JSON.stringify(body) : undefined,
     });
-    const data: ApiResponse<T> = await res.json();
+    const text = await res.text();
+    let data: ApiResponse<T>;
+    try { data = JSON.parse(text); }
+    catch { throw new Error(`Server error (${res.status})`); }
     if (!res.ok) throw new Error(data.error ?? 'Request failed');
     return data;
   }, [getAccessTokenSilently]);

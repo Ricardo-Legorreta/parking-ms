@@ -8,32 +8,42 @@ import { ParkingSpotModel }    from '@/models/ParkingSpot';
 import type { ApiResponse, IParkingSpot } from '@/types';
 
 const getSpots = withAuth(async (req, res: NextApiResponse<ApiResponse>) => {
-  let bldg = req.query.building as string;
-  if (req.user.role !== 'admin') {
+  try {
+    let bldg = req.query.building as string;
+    if (req.user.role !== 'admin') {
+      await connectDB();
+      const r = await ResidentModel.findById(req.user.residentId).select('building').lean();
+      bldg = (r?.building as string) ?? '';
+    }
+    if (!bldg) return res.status(400).json({ success: false, error: 'Building is required' });
+
+    const cached = await cacheGet<IParkingSpot[]>(CacheKey.spots(bldg));
+    if (cached) return res.status(200).json({ success: true, data: cached });
+
     await connectDB();
-    const r = await ResidentModel.findById(req.user.residentId).select('building').lean();
-    bldg = (r?.building as string) ?? '';
+    const spots = await ParkingSpotModel.find({ building: bldg, isActive: true }).select('-__v').sort({ floor: 1, spotNumber: 1 }).lean();
+    await cacheSet(CacheKey.spots(bldg), spots, TTL.SPOTS);
+    return res.status(200).json({ success: true, data: spots });
+  } catch (err) {
+    console.error('[spots/list]', err);
+    return res.status(500).json({ success: false, error: 'Failed to fetch spots' });
   }
-  if (!bldg) return res.status(400).json({ success: false, error: 'Building is required' });
-
-  const cached = await cacheGet<IParkingSpot[]>(CacheKey.spots(bldg));
-  if (cached) return res.status(200).json({ success: true, data: cached });
-
-  await connectDB();
-  const spots = await ParkingSpotModel.find({ building: bldg, isActive: true }).select('-__v').sort({ floor: 1, spotNumber: 1 }).lean();
-  await cacheSet(CacheKey.spots(bldg), spots, TTL.SPOTS);
-  return res.status(200).json({ success: true, data: spots });
 });
 
 const createSpot = withAdmin(async (req, res: NextApiResponse<ApiResponse>) => {
-  const { spotNumber, building, floor, type } = sanitizeObject(req.body ?? {}) as { spotNumber: string; building: string; floor: number; type: string };
-  if (!spotNumber || !building || floor === undefined)
-    return res.status(400).json({ success: false, error: 'spotNumber, building and floor are required' });
+  try {
+    const { spotNumber, building, floor, type } = sanitizeObject(req.body ?? {}) as { spotNumber: string; building: string; floor: number; type: string };
+    if (!spotNumber || !building || floor === undefined)
+      return res.status(400).json({ success: false, error: 'spotNumber, building and floor are required' });
 
-  await connectDB();
-  const spot = await ParkingSpotModel.create({ spotNumber, building, floor, type: type ?? 'standard' });
-  await cacheDel(CacheKey.spots(building));
-  return res.status(201).json({ success: true, data: spot.toObject(), message: 'Spot created' });
+    await connectDB();
+    const spot = await ParkingSpotModel.create({ spotNumber, building, floor, type: type ?? 'standard' });
+    await cacheDel(CacheKey.spots(building));
+    return res.status(201).json({ success: true, data: spot.toObject(), message: 'Spot created' });
+  } catch (err) {
+    console.error('[spots/create]', err);
+    return res.status(500).json({ success: false, error: 'Failed to create spot' });
+  }
 });
 
 export default async function spotsHandler(req: AuthenticatedRequest, res: NextApiResponse) {
