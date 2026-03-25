@@ -5,6 +5,9 @@ on:
 concurrency:
   group: deploy-production
   cancel-in-progress: false
+permissions:
+  contents: write
+
 jobs:
   deploy-production:
     name: Deploy to Production
