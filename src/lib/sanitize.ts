@@ -1,8 +1,21 @@
-import DOMPurify from 'isomorphic-dompurify';
+/**
+ * Strip HTML/script tags from a string.
+ * Replaces isomorphic-dompurify (which depends on jsdom and breaks in
+ * Vercel serverless due to ESM-only transitive deps).
+ */
+function stripHtml(input: string): string {
+  return input
+    .replace(/<\/?\s*script[^>]*>/gi, '')
+    .replace(/<[^>]*>/g, '')
+    .replace(/&lt;/gi, '<').replace(/&gt;/gi, '>')
+    .replace(/<[^>]*>/g, '')
+    .replace(/on\w+\s*=/gi, '')
+    .replace(/javascript\s*:/gi, '');
+}
 
 export function sanitizeString(value: unknown): string {
   if (typeof value !== 'string') return '';
-  return DOMPurify.sanitize(value.trim());
+  return stripHtml(value.trim());
 }
 
 export function sanitizeObject<T extends Record<string, unknown>>(obj: T): T {
